@@ -1,9 +1,7 @@
 package io.zipcoder.crudapp;
 
 import java.util.List;
-import java.util.Map;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,14 +12,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@RequestMapping("/people")
 public class PersonController {
     @Autowired
-    private PersonRepository personRepo;
+    PersonRepository personRepo;
 
     @PostMapping(value = "/people")
     public ResponseEntity<Person> createPerson(@RequestBody Person p){
