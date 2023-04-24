@@ -1,7 +1,18 @@
 package io.zipcoder.crudapp;
 
 import java.util.List;
+import java.util.Map;
 
+import org.apache.catalina.connector.Response;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -9,28 +20,38 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class PersonController {
-    @RequestMapping(value = "/people", method = RequestMethod.POST)
-    @ResponseBody
-    public Person createPerson(Person p){
-        return new Person();
+    @Autowired
+    private PersonRepository personRepo;
+
+    @PostMapping(value = "/people")
+    public ResponseEntity<Person> createPerson(@RequestBody Person p){
+        return new ResponseEntity<>(personRepo.save(p), HttpStatus.CREATED);
     }
-    @RequestMapping(value = "/people/{id}", method = RequestMethod.GET)
-    @ResponseBody
-    public Person getPerson(int id){
-        return null;
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<Person> getPerson(@PathVariable int id){
+        return new ResponseEntity<>(personRepo.findOne(id), HttpStatus.FOUND);
     }
-    @RequestMapping(value = "/people", method = RequestMethod.GET)
-    @ResponseBody
-    public List<Person> getPersonList(){
-        return null;
+    @GetMapping(value = "/people")
+    public ResponseEntity<List<Person>> getPersonList(){
+        return new ResponseEntity<>((List<Person>)personRepo.findAll(), HttpStatus.OK);
     }
-    @RequestMapping(value = "/people/{id}", method = RequestMethod.PUT)
-    @ResponseBody
-    public Person updatePerson(Person p){
-        return null;
+    @PutMapping("/{id}")
+    public ResponseEntity<Person> updatePerson(@PathVariable int id, @RequestBody Person p) {
+        Person existingPerson = personRepo.findOne(id);
+
+        p.setId(id);
+        Person savedPerson = personRepo.save(p);
+    
+        if (existingPerson == null) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedPerson);
+        } else {
+            return ResponseEntity.status(HttpStatus.OK).body(savedPerson);
+        }
     }
-    @RequestMapping(value = "/people/{id}", method = RequestMethod.DELETE)
-    @ResponseBody
-    public void deletePerson(int id){
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletePerson(@PathVariable int id){
+        personRepo.delete(id);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
-}
+    }
